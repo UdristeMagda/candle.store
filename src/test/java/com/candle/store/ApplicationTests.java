@@ -1,4 +1,4 @@
-package com.candle.store;
+package com.market.stor;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
