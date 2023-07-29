@@ -17,42 +17,43 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
 
-        @Autowired
-        private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-        @Bean
-        public static PasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder();
-        }
+    @Bean
+    public static PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        @Bean// sheruieste in toata aplicatia
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http
-                    .authorizeHttpRequests((authz) -> authz
-                            .requestMatchers("/css/**").permitAll()
-                            .requestMatchers("/register/**").permitAll()
-                            .requestMatchers("/users").hasRole("ADMIN")
-                            .anyRequest().authenticated()
-                    )
-                    .formLogin(
-                            form -> form
-                                    .loginPage("/login")
-                                    .loginProcessingUrl("/login")
-                                    .defaultSuccessUrl("/")
-                                    .permitAll()
-                    ).logout(
-                            logout -> logout
-                                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                                    .permitAll()
-                    );
-            http.csrf().disable();
-            return http.build();
-        }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers("/css/**").permitAll()
+                        .requestMatchers("/img/**").permitAll()
+                        .requestMatchers("/register/**").permitAll()
+                        .requestMatchers("/users").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(
+                        form -> form
+                                .loginPage("/login")
+                                .loginProcessingUrl("/login")
+                                .defaultSuccessUrl("/")
+                                .permitAll()
+                ).logout(
+                        logout -> logout
+                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                                .permitAll()
+                );
+        http.csrf().disable();
+        return http.build();
+    }
 
-        @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-            auth
-                    .userDetailsService(userDetailsService)
-                    .passwordEncoder(passwordEncoder());
-        }
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
+    }
 }

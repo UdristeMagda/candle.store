@@ -2,6 +2,7 @@ package com.candle.store.mapper;
 
 import com.candle.store.dto.UserDto;
 import com.candle.store.entity.Role;
+import com.candle.store.entity.ShoppingCart;
 import com.candle.store.entity.User;
 import com.candle.store.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,35 +14,39 @@ import java.util.Optional;
 
 @Component
 public class UserMapper {
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private RoleRepository roleRepository;
 
-    public User mapp(UserDto userDto) {
+    public User map(UserDto userDto) {
         User user = new User();
         user.setFullName(userDto.getFullName());
         user.setEmail(userDto.getEmail());
         String passwordEncoded = passwordEncoder.encode(userDto.getPassword());
         user.setPassword(passwordEncoded);
-        user.setAddress(user.getAddress());
-        Optional<Role> role = roleRepository.findByName(userDto.getUserRole());
-        if (role.isEmpty()) {
-            Role role1 = new Role();
-            role1 = saveRole(userDto);
-            user.setRoles(List.of(role1));
-        }else {
-            user.setRoles(List.of(role.get()));
-        }
+        user.setAddress(userDto.getAddress());
 
+        Optional<Role> optionalRole = roleRepository.findByName(userDto.getUserRole());
+        if (optionalRole.isEmpty()) {
+            Role role = saveRole(userDto);
+            user.setRoles(List.of(role));
+        } else {
+            user.setRoles(List.of(optionalRole.get()));
+        }
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(user);
+        user.setShoppingCart(shoppingCart);
 
         return user;
-
     }
 
     private Role saveRole(UserDto userDto) {
         Role role = new Role();
         role.setName(userDto.getUserRole());
+
         return roleRepository.save(role);
     }
 }
